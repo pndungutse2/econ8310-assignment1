@@ -1,37 +1,33 @@
 import pandas as pd
-from pygam import LinearGAM, s, f
+from pygam import LinearGAM, s, f, l
 
-# Load training data and convert timestamp to datetime
-train_data = pd.read_csv('https://github.com/dustywhite7/econ8310-assignment1/raw/main/assignment_data_train.csv')
-train_data['Timestamp'] = pd.to_datetime(train_data['Timestamp'])
+#gather the data for the model and transform to date timne
 
-# Extract time-based features
-train_data['year'] = train_data['Timestamp'].dt.year
-train_data['month'] = train_data['Timestamp'].dt.month
-train_data['day'] = train_data['Timestamp'].dt.weekday
-train_data['hour'] = train_data['Timestamp'].dt.hour
+data=pd.read_csv('https://github.com/dustywhite7/econ8310-assignment1/raw/main/assignment_data_train.csv')
+data['Timestamp']=pd.to_datetime(data['Timestamp'])
+data['year']=data['Timestamp'].dt.year
+data['month']=data['Timestamp'].dt.month
+data['day']=data['Timestamp'].dt.weekday
+data['hour']=data['Timestamp'].dt.hour
 
-# Load test data and convert timestamp to datetime
-test_data = pd.read_csv('https://github.com/dustywhite7/econ8310-assignment1/raw/main/assignment_data_test.csv')
-test_data['Timestamp'] = pd.to_datetime(test_data['Timestamp'])
+#gather the data to test the model
 
-# Extract time-based features
-test_data['year'] = test_data['Timestamp'].dt.year
-test_data['month'] = test_data['Timestamp'].dt.month
-test_data['day'] = test_data['Timestamp'].dt.weekday
-test_data['hour'] = test_data['Timestamp'].dt.hour
+dataTest=pd.read_csv('https://github.com/dustywhite7/econ8310-assignment1/raw/main/assignment_data_test.csv')
+dataTest['Timestamp']=pd.to_datetime(dataTest['Timestamp'])
+dataTest['year']=dataTest['Timestamp'].dt.year
+dataTest['month']=dataTest['Timestamp'].dt.month
+dataTest['day']=dataTest['Timestamp'].dt.weekday
+dataTest['hour']=dataTest['Timestamp'].dt.hour
 
-# Select relevant features
-X_train = train_data[['month', 'day', 'hour']]
-y_train = train_data['trips']
-X_test = test_data[['month', 'day', 'hour']]
+dataTest=dataTest[['month', 'day', 'hour']]
 
-# Create and train the model using a Generalized Additive Model (GAM)
-gam_model = LinearGAM(s(0) + f(1) + s(2))
-gam_model.fit(X_train, y_train)
+#create variables to build the model
+x=data[['month', 'day', 'hour']]
+y=data['trips']
 
-# Make predictions
-predictions = gam_model.predict(X_test)
+#create the model
+model=LinearGAM(s(0)+f(1)+s(2))
+modelFit=model.gridsearch(x.values, y)
 
-# Display the first few predictions
-print(predictions[:10])
+#make predictions
+pred=modelFit.predict(dataTest.values)
